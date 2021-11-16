@@ -5,7 +5,7 @@
     @version 1.0 17/03/21  
 */
 
-#include "TemperatureStub.h"
+#include "../headers/TemperatureStub.h"
 
 void TemperatureStub::init(int _inputPinUsed, int _typeSensorUsed){
     inputPinUsed = _inputPinUsed;

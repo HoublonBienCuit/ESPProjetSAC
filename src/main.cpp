@@ -62,7 +62,7 @@
 using namespace std;
 
 //Pour avoir les données du senseur de température 
-#include "TemperatureStub.h"
+#include "headers/TemperatureStub.h"
 #define DHTPIN  15   // Pin utilisée par le senseur DHT11 / DHT22
 #define DHTTYPE DHT22  //Le type de senseur utilisé (mais ce serait mieux d'avoir des DHT22 pour plus de précision)
 TemperatureStub *temperatureStub = NULL;
@@ -73,7 +73,7 @@ WiFiManager wm;
 #define WEBSERVER_H
 
 //Pour la gestion du serveur ESP32
-#include "MyServer.h"
+#include "headers/MyServer.h"
 MyServer *myServer = NULL;
 
 //Variable pour la connection Wifi

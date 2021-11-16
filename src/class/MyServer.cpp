@@ -5,7 +5,7 @@
     @version 1.2 21/10/20
 */
 #include <Arduino.h>
-#include "MyServer.h"
+#include "../headers/MyServer.h"
 using namespace std;
 
 typedef std::string (*CallbackType)(std::string);
