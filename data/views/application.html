@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>[DEV 1.0] SAC - Application</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+    <body>
+        <div class="zone">
+            <div class="logo"><img src="images/logo.png" alt="logo" /></div>
+            <div class="type">
+                <h2>Type de bois</h2>
+                <select id="selectionBois"></select>
+            </div>
+            <div class="caracteristiques">
+                <h2>Caractéristiques</h2>
+                <table>
+                    <tr><th><span>Bois</span> <span>:</span></th><td><span id="bois"></span></td></tr>
+                    <tr><th><span>Type</span> <span>:</span></th><td><span id="type"></span></td></tr>
+                    <tr><th><span>Origine</span> <span>:</span></th><td><span id="origine"></span></td></tr>
+                    <tr><th><span>Temps de séchage</span> <span>:</span></th><td><span id="tempsSechage"></span></td></tr>
+                    <tr><th><span>Température minimum</span> <span>:</span></th><td><span id="tempMin"></span></td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="zone">
+            <div class="titreZone"><h2>Controle du four de séchage</h2></div>
+            <div class="vueFour">
+                <h3>Temperature du four</h3>
+                <div class="temperature">
+                    <span id="tempVal">20</span> Celcius
+                </div>
+                <button id="demarrerFour" class="demarrerFour">Demarrage du four</button>
+                <div class="infosPied">
+                    <span class="typeBois" id="typeBois">Erable</span>
+                    <span class="temps">
+                        <span id="tempsActuel">0</span>s/<span id="tempsTotal"></span>s
+                    </span>
+                    <span class="temperatureMini">min <span id="tempMinFour"></span> Celcius</span>
+                    <div class="dels">
+                        <div class="delRouge">O</div>
+                        <div class="delJaune active">O</div>
+                        <div class="delVerte active">O</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/application.js"></script>
+    </body>
+</html>
