@@ -46,7 +46,7 @@ void OvenSystem::init() {
 }
 
 void OvenSystem::update(float dt) {
-    myOled->update(dt);
+    myOled->update();
 
     double lastTemp = ovenTemp;
     ovenTemp = temperatureStub->getTemperature();
