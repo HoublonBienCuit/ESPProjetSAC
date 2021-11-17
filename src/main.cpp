@@ -55,38 +55,10 @@
 #include <string>
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
 
 #include "myFunctions.cpp" //fonctions utilitaires
 
 using namespace std;
-
-//Pour avoir les données du senseur de température 
-#include "headers/TemperatureStub.h"
-#define DHTPIN  15   // Pin utilisée par le senseur DHT11 / DHT22
-#define DHTTYPE DHT22  //Le type de senseur utilisé (mais ce serait mieux d'avoir des DHT22 pour plus de précision)
-TemperatureStub *temperatureStub = NULL;
-
-//declaration du oled
-#include "headers/MyOled.h"
-MyOled *myOled = NULL;
-
-#include <HTTPClient.h>
-#include <WiFiManager.h>
-WiFiManager wm;
-#define WEBSERVER_H
-
-//Pour la gestion du serveur ESP32
-#include "headers/MyServer.h"
-MyServer *myServer = NULL;
-
-//Variable pour la connection Wifi
-const char *SSID = "SAC_Daniel_";
-const char *PASSWORD = "sac_";
-String ssIDRandom;
-
-//variable de la température du four
-float tempFour = 0.0f;
 
 //fonction statique qui permet aux objets d'envoyer des messages (callBack) 
 // arg0 : Action 
@@ -107,52 +79,21 @@ string CallBackMessageListener(string message) {
     string arg9 = getValue(message, ' ', 9);
     string arg10 = getValue(message, ' ', 10);
   
-    if (string(actionToDo.c_str()).compare(string("action")) == 0) {
-         return "ok";
-    } else if (string(actionToDo.c_str()).compare(string("ObtenirTemperature")) == 0) {
-         return (String(tempFour).c_str());
+    if (string(actionToDo.c_str()).compare(string("ObtenirTemperature")) == 0) {
+         return 0;//(String(tempFour).c_str());
     }
 
     return "";
 }
 
+#include "headers/OvenSystem.h"
+OvenSystem* ovenSystem;
+
 void setup() { 
     Serial.begin(9600);
-    delay(100);
 
-    //Connection au WifiManager
-    String ssIDRandom, PASSRandom;
-    String stringRandom;
-    stringRandom = get_random_string(4).c_str();
-    ssIDRandom = SSID;
-    ssIDRandom = ssIDRandom + stringRandom;
-    stringRandom = get_random_string(4).c_str();
-    PASSRandom = PASSWORD;
-    PASSRandom = PASSRandom + stringRandom;
-
-    char strToPrint[128];
-    sprintf(strToPrint, "Identification : %s   MotDePasse: %s", ssIDRandom.c_str(), PASSRandom.c_str());
-    Serial.println(strToPrint);
-
-
-    if (!wm.autoConnect(ssIDRandom.c_str(), PASSRandom.c_str())) {
-        Serial.println("Erreur de connexion.");
-    } else {
-        Serial.println("Connexion Établie.");
-    }
-
-    // ----------- Routes du serveur ----------------
-    myServer = new MyServer(80);
-    myServer->initAllRoutes();
-    myServer->initCallback(&CallBackMessageListener);
-
-    //Initiation pour la lecture de la température
-    temperatureStub = new TemperatureStub;
-    temperatureStub->init(DHTPIN, DHTTYPE); //Pin 15 et Type DHT22
-
-    //Initialization du Oled
-    myOled = new MyOled();
-
+    //Création du système principale
+    ovenSystem = new OvenSystem();
  }
 
  //Variables pour calculer le temps entre deux updates
@@ -180,8 +121,6 @@ void loop() {
     }
     lastUpdate = now;
 
-    //update l'objet doorsytem et passe en paramètre le dt en seconde
-    myOled->update((dt + (frameDelay - dt)) / 1000.0f);// convertir en seconde
-    //Gestion de la température
-    tempFour = temperatureStub->getTemperature();
+    //update l'objet ovenSystem et passe en paramètre le dt en seconde
+    ovenSystem->update((dt + (frameDelay - dt)) / 1000.0f);// convertir en seconde
 }
