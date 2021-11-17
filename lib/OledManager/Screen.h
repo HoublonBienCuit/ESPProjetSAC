@@ -81,7 +81,7 @@ using namespace std;
 //Le nombre maximum de pages pour l'écran
 int const MAX_PAGES = 4;
 //Le nombre d'instances (d'objet texte) maximum par page
-int const MAX_INSTANCES_PER_PAGE = 5;
+int const MAX_INSTANCES_PER_PAGE = 7;
 
 //Réécriture de la classe DoorSystem pour pouvoir accéder à cette classe
 //class DoorSystem;
