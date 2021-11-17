@@ -6,7 +6,7 @@
  * V1.0 (voir le fichier Text.h)
  **/
 
-#include "../headers/Text.h"
+#include "Text.h"
 
 /**
  * @brief Constructeur par défaut de la classe Text

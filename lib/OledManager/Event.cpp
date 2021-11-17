@@ -6,7 +6,7 @@
  * V1.0 (voir le fichier Event.h)
  **/
 
-#include "headers/Event.h"
+#include "Event.h"
 
 Event::Event(EventCall tevent, string id) {
     _event = tevent;

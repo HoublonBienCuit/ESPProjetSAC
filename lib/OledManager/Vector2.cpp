@@ -6,7 +6,7 @@
  * V1.0 (voir le fichier Vector2.h)
  **/
 
-#include "../headers/Vector2.h"
+#include "Vector2.h"
 
 /**
  * @brief Constructeur par défaut de la classe Vector2

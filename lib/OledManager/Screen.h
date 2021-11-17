@@ -74,7 +74,7 @@
 
 #include "Text.h"
 
-#include "Event.h"
+//#include "Event.h"
 
 using namespace std;
 
@@ -84,7 +84,13 @@ int const MAX_PAGES = 6;
 int const MAX_INSTANCES_PER_PAGE = 10;
 
 //Réécriture de la classe DoorSystem pour pouvoir accéder à cette classe
-class DoorSystem;
+//class DoorSystem;
+
+//Variables d'initialization de l'écran
+#define DEFAULT_SCREEN_WIDTH 128        // OLED display width, in pixels
+#define DEFAULT_SCREEN_HEIGHT 64        // OLED display height, in pixels
+#define DEFAULT_OLED_RESET 4            // Reset pin # (or -1 if sharing Arduino reset pin)
+#define DEFAULT_OLED_I2C_ADDRESS 0x3C   // Adresse I2C de l'écran Oled
 
 /**
  * @brief Classe représentant l'écran du système
@@ -93,13 +99,13 @@ class DoorSystem;
 class Screen {
     //Commentaires des fonctions dans le fichier Screen.cpp
     public:
-        Screen(TwoWire *twi, uint8_t RST = 4, uint8_t rawHeight = 64, uint8_t rawWidth = 128);
+        Screen(TwoWire *twi, uint8_t RST = DEFAULT_OLED_RESET, uint8_t rawHeight = DEFAULT_SCREEN_HEIGHT, uint8_t rawWidth = DEFAULT_SCREEN_WIDTH);
         /**
          * @brief Déconstructeur de la classe Screen
          */
         ~Screen() {};
 
-        int init(uint8_t addrI2C = 0x3C);
+        int init(uint8_t addrI2C = DEFAULT_OLED_I2C_ADDRESS);
         void update();
 
         void clearScreen();
@@ -115,8 +121,8 @@ class Screen {
 
         int getCurrentPage();
 
-        void setResetEvent(Event* event, int page);
-        void resetPage(DoorSystem* currentSystem, int page);
+        //void setResetEvent(Event* event, int page);
+        //void resetPage(DoorSystem* currentSystem, int page);
     private:
         //Objet représentant le display
         Adafruit_SSD1306 _display;

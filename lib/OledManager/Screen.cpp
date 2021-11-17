@@ -6,7 +6,7 @@
  * V1.0 (voir le fichier Screen.h)
  **/
 
-#include "../headers/Screen.h"
+#include "Screen.h"
 
 /**
  * @brief Constructeur par défaut de la classe Screen
@@ -194,9 +194,9 @@ int Screen::getCurrentPage() {
  * @param event l'événement du reset
  * @param page la page à reseter
  */
-void Screen::setResetEvent(Event* event, int page) {
+/*void Screen::setResetEvent(Event* event, int page) {
     _resetEvents[page] = event;
-}
+}*/
 
 /**
  * @brief Méthode qui permet d'activer l'événement pour reset la page
@@ -204,7 +204,7 @@ void Screen::setResetEvent(Event* event, int page) {
  * @param currentSystem le systeme actuelle
  * @param page numéro de la page à reset
  */
-void Screen::resetPage(DoorSystem* currentSystem, int page) {
+/*void Screen::resetPage(DoorSystem* currentSystem, int page) {
     if (_resetEvents[page] != nullptr)
         _resetEvents[page]->forceEvent(currentSystem);
-}
+}*/
