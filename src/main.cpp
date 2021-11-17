@@ -67,6 +67,10 @@ using namespace std;
 #define DHTTYPE DHT22  //Le type de senseur utilisé (mais ce serait mieux d'avoir des DHT22 pour plus de précision)
 TemperatureStub *temperatureStub = NULL;
 
+//declaration du oled
+#include "headers/MyOled.h"
+MyOled *myOled = NULL;
+
 #include <HTTPClient.h>
 #include <WiFiManager.h>
 WiFiManager wm;
@@ -116,7 +120,7 @@ void setup() {
     Serial.begin(9600);
     delay(100);
 
- //Connection au WifiManager
+    //Connection au WifiManager
     String ssIDRandom, PASSRandom;
     String stringRandom;
     stringRandom = get_random_string(4).c_str();
@@ -126,18 +130,16 @@ void setup() {
     PASSRandom = PASSWORD;
     PASSRandom = PASSRandom + stringRandom;
 
-char strToPrint[128];
+    char strToPrint[128];
     sprintf(strToPrint, "Identification : %s   MotDePasse: %s", ssIDRandom.c_str(), PASSRandom.c_str());
     Serial.println(strToPrint);
 
 
- if (!wm.autoConnect(ssIDRandom.c_str(), PASSRandom.c_str())){
+    if (!wm.autoConnect(ssIDRandom.c_str(), PASSRandom.c_str())) {
         Serial.println("Erreur de connexion.");
-      
-        }
-    else {
+    } else {
         Serial.println("Connexion Établie.");
-        }
+    }
 
     // ----------- Routes du serveur ----------------
     myServer = new MyServer(80);
@@ -147,10 +149,39 @@ char strToPrint[128];
     //Initiation pour la lecture de la température
     temperatureStub = new TemperatureStub;
     temperatureStub->init(DHTPIN, DHTTYPE); //Pin 15 et Type DHT22
+
+    //Initialization du Oled
+    myOled = new MyOled();
+
  }
 
+ //Variables pour calculer le temps entre deux updates
+float lastUpdate = 0, now = 0;
+
+//Variable pour barrer la boucle à 30 frames par seconde
+const int FPS = 30;
+const int frameDelay = 1000 / FPS;
+
+/**
+ * @brief loop du programme, utilisé par Arduino
+ * 
+ */
 void loop() {
+     now = millis();
+
+    //Temps entre deux updates en milliseconde
+    int dt = now - lastUpdate;
+    
+    //Condition qui permet de barrer la boucle à 30 frames par secondes
+    if (dt < frameDelay) {
+        delay(frameDelay - dt);
+
+        now = millis();
+    }
+    lastUpdate = now;
+
+    //update l'objet doorsytem et passe en paramètre le dt en seconde
+    myOled->update((dt + (frameDelay - dt)) / 1000.0f);// convertir en seconde
     //Gestion de la température
     tempFour = temperatureStub->getTemperature();
-    delay(1000);
 }

@@ -27,7 +27,7 @@ Screen::Screen(TwoWire *twi, uint8_t RST, uint8_t rawHeight, uint8_t rawWidth) {
  * @return int 0 : si l'initialization c'est n'a pas d'erreur, 1 : si l'initialization a eu une erreur
  */
 int Screen::init(uint8_t addrI2C) {
-    if (!_display.begin(SSD1306_SWITCHCAPVCC, addrI2C)) { 
+    if (!_display.begin(SSD1306_SWITCHCAPVCC, addrI2C)) {
         return 1;
     }
 
@@ -141,6 +141,7 @@ void Screen::addPage(int te, Text* elements[]) {
 void Screen::changePage(int page) {
     if (_currentPage != page) {
         _currentPage = page;
+        Serial.print(page);
     }
 }
 
