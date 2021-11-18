@@ -50,41 +50,7 @@
                 script.js               V1.0    JS (fonctions JavaScript)
               
  * */
-
-#include <iostream>
-#include <string>
-
 #include <Arduino.h>
-
-#include "myFunctions.cpp" //fonctions utilitaires
-
-using namespace std;
-
-//fonction statique qui permet aux objets d'envoyer des messages (callBack) 
-// arg0 : Action 
-// arg1 ... : Parametres
-string CallBackMessageListener(string message) {
-    while(replaceAll(message, std::string("  "), std::string(" ")));
-
-    //Décortiquer le message
-    string actionToDo = getValue(message, ' ', 0);
-    string arg1 = getValue(message, ' ', 1);
-    string arg2 = getValue(message, ' ', 2);
-    string arg3 = getValue(message, ' ', 3);
-    string arg4 = getValue(message, ' ', 4);
-    string arg5 = getValue(message, ' ', 5);
-    string arg6 = getValue(message, ' ', 6);
-    string arg7 = getValue(message, ' ', 7);
-    string arg8 = getValue(message, ' ', 8);
-    string arg9 = getValue(message, ' ', 9);
-    string arg10 = getValue(message, ' ', 10);
-  
-    if (string(actionToDo.c_str()).compare(string("ObtenirTemperature")) == 0) {
-         return 0;//(String(tempFour).c_str());
-    }
-
-    return "";
-}
 
 #include "headers/OvenSystem.h"
 OvenSystem* ovenSystem;

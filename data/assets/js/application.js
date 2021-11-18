@@ -9,13 +9,10 @@
 /** Liste du bois */
 var listeBoisInformations = {};
 
-const routeAPI = "http://172.16.203.86/";
+const routeAPI = "http://10.0.0.52/";
 
 /**Fonction qui permet d'envoyer une requête par la méthode GET */
 function sendGETRequest(apiRequest, params, callback) {
-    /*let paramsString = "/";
-    params.forEach(param => paramsString += param + "/");*/
-
     let paramsString = "?";
     for (const [key, value] of Object.entries(params)) {
         paramsString += key + "=" + value + "&";
@@ -38,25 +35,6 @@ function getElement(query) {
 
 /**Fonction qui affiche les détails du bois */
 function afficherDetailsBois(idBois) {
-    /*sendGETRequest("ObtenirBois", {"idBois" : idBois}, function() {
-        if (this.readyState != 4) return;
-        if (this.status == 200) {
-            var bois = JSON.parse(this.responseText);
-            if (bois) {
-                getElement("#bois").innerHTML = bois.nom;
-                getElement("#type").innerHTML = bois.type;
-                getElement("#origine").innerHTML = bois.origine;
-                getElement("#tempsSechage").innerHTML = bois.tempsSechage;
-                getElement("#tempMin").innerHTML = bois.tempMin;
-
-                getElement("#typeBois").innerHTML = bois.nom;
-                getElement("#tempMinFour").innerHTML = bois.tempMin;
-                getElement("#tempsTotal").innerHTML = bois.tempsSechage;
-            } else {
-                console.log("err");
-            }
-        }
-    });*/
     let bois = listeBoisInformations[idBois];
     getElement("#bois").innerHTML = bois.nom;
     getElement("#type").innerHTML = bois.type;

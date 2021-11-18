@@ -4,21 +4,11 @@
     @author Alain Dubé
     @version 1.2 21/10/20
 */
-#include <Arduino.h>
-#include "../headers/MyServer.h"
-using namespace std;
+#include "../headers/OvenSystem.h"
 
-typedef std::string (*CallbackType)(std::string);
-CallbackType MyServer::ptrToCallBackFunction = NULL;
-
-//Exemple pour appeler une fonction CallBack
-//if (ptrToCallBackFunction) (*ptrToCallBackFunction)(stringToSend);
-void MyServer::initCallback(CallbackType callback) {
-    ptrToCallBackFunction = callback;
-}
+OvenSystem* MyServer::currentSystem = nullptr;
 
 void MyServer::initAllRoutes() {
-
     //Initialisation du SPIFF.
     if (!SPIFFS.begin(true)) {
         Serial.println("An Error has occurred while mounting SPIFFS");
@@ -40,7 +30,7 @@ void MyServer::initAllRoutes() {
 
     this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
         HTTPClient http;
-        String woodApiRestAddress = "http://172.16.206.86:8000/api/ObtenirTousBois";
+        String woodApiRestAddress = "http://10.0.0.78:8000/api/ObtenirTousBois";
         http.begin(woodApiRestAddress);
         http.GET();
         String response = http.getString();
@@ -49,8 +39,8 @@ void MyServer::initAllRoutes() {
     });
 
     this->on("/getFourTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
-        string temperatureString = "";
-        if (ptrToCallBackFunction) temperatureString = (*ptrToCallBackFunction)("ObtenirTemperature");
+        std::string temperatureString = "";
+        temperatureString = toString(currentSystem->getOvenTemp());
 
         request->send(200, "application/json", String(temperatureString.c_str()));
     });

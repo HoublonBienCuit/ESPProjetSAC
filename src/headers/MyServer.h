@@ -28,28 +28,26 @@
         //et téléverser en utilisant "Upload Filesystem Image" dans PlatformIO
 
 **/
-#ifndef MYSERVER_H
-#define MYSERVER_H
+#pragma once
+
 #include <AsyncTCP.h>
 #include <SPIFFS.h>
 #include <ESPAsyncWebServer.h>
-#include <HTTPClient.h>
 #include <string>
+
+#include <HTTPClient.h>
+#include <WiFiManager.h>
 //#include "myFunctions.cpp"
 
 //Pour le json dans L'API.
 #include <ArduinoJson.h>
 
+class OvenSystem;
+
 class MyServer : public AsyncWebServer {
     public:
-        MyServer(uint8_t port) : AsyncWebServer(port){};
-        
-        typedef std::string (*CallbackType)(std::string);
-        void initCallback(CallbackType callback);
-                
-        void initAllRoutes();  
+        static OvenSystem* currentSystem;
 
-    private:
-        static CallbackType ptrToCallBackFunction;
-   };
-#endif
+        MyServer(uint8_t port) : AsyncWebServer(port){};
+        void initAllRoutes();
+};

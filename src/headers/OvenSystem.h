@@ -31,22 +31,21 @@ const char *PASSWORD = "sac_password";
 #include <iostream>
 #include <iomanip>
 
-template<typename ValueType>
-std::string toString(ValueType v)
-{
-    std::stringstream ss;
-    ss << std::fixed << std::setprecision(2) << v;
-    return ss.str();
-}
-
 class OvenSystem {
     public:
         OvenSystem();
         ~OvenSystem() {};
 
         void update(float dt);
+
+        double getOvenTemp();
     private:
-        void init();
+        void initAll();
+
+        void initOled();
+        void initTempStub();
+        void initWifi();
+        void initServer();
 
         MyOled* myOled;
         TemperatureStub* temperatureStub;
@@ -55,3 +54,11 @@ class OvenSystem {
 
         double ovenTemp;
 };
+
+template<typename ValueType>
+std::string toString(ValueType v)
+{
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << v;
+    return ss.str();
+}

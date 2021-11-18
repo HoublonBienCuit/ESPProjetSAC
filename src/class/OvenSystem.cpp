@@ -3,16 +3,12 @@
 #include "../headers/OvenSystem.h"
 
 OvenSystem::OvenSystem() {
-    init();
+    initAll();
 }
 
-void OvenSystem::init() {
+void OvenSystem::initOled() {
     //init MyOled
     myOled = new MyOled();
-
-    //init TemperatureStub
-    temperatureStub = new TemperatureStub();
-    temperatureStub->init(DHTPIN, DHTTYPE); //Pin 15 et Type DHT22
 
     //Définir le texte des boutons
     Screen* currentScreen = myOled->getScreen();
@@ -22,9 +18,20 @@ void OvenSystem::init() {
     //Définir le texte de connexion sur l'ESP32
     currentScreen->getElementById("ssid_P2")->changeText(string(SSID));
     currentScreen->getElementById("pass_P2")->changeText(string(PASSWORD));
+}
 
+//init TemperatureStub
+void OvenSystem::initTempStub() {
+    
+    temperatureStub = new TemperatureStub();
+    temperatureStub->init(DHTPIN, DHTTYPE); //Pin 15 et Type DHT22
+}
+
+void OvenSystem::initWifi() {
     //init wifiManager
     wifiManager = new WiFiManager();
+
+    Screen* currentScreen = myOled->getScreen();
 
     if (!wifiManager->autoConnect(SSID, PASSWORD)) {
         Serial.println("Erreur de connexion.");
@@ -32,17 +39,26 @@ void OvenSystem::init() {
     } else {
         Serial.println("Connexion Établie.");
     }
+}
 
+void OvenSystem::initServer() {
     //init MyServer
     myServer = new MyServer(DEFAULT_PORT);
+    MyServer::currentSystem = this;
     myServer->initAllRoutes();
-    //myServer->initCallback(&CallBackMessageListener);
 
-    currentScreen->changePage(READY_PAGE);
+    Screen* currentScreen = myOled->getScreen();
 
     string ipv4Adress = WiFi.localIP().toString().c_str();
     currentScreen->getElementById("ip_adress_P3")->changeText(ipv4Adress);
     currentScreen->getElementById("ip_adress_P4")->changeText(ipv4Adress);
+}
+
+void OvenSystem::initAll() {
+    initOled();
+    initTempStub();
+    initWifi();
+    initServer();
 }
 
 void OvenSystem::update(float dt) {
@@ -55,4 +71,8 @@ void OvenSystem::update(float dt) {
         currentScreen->getElementById("temp_P3")->changeText(toString(ovenTemp));
         currentScreen->getElementById("temp_P4")->changeText(toString(ovenTemp));
     }
+}
+
+double OvenSystem::getOvenTemp() {
+    return ovenTemp;
 }
