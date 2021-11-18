@@ -39,10 +39,25 @@ void MyServer::initAllRoutes() {
     });
 
     this->on("/getFourTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
-        std::string temperatureString = "";
-        temperatureString = toString(currentSystem->getOvenTemp());
+        std::string temperatureString = toString(currentSystem->getOvenTemp());
 
         request->send(200, "application/json", String(temperatureString.c_str()));
+    });
+
+    this->on("/startOven", HTTP_GET, [](AsyncWebServerRequest *request) {
+        if (request->hasParam("") && request->hasParam("")) {
+            AsyncWebParameter* cookingTimeParam = request->getParam("cookingTime");
+            AsyncWebParameter* minTempParam = request->getParam("minTemp");
+            const char* stringCookingTime = cookingTimeParam->value().c_str();
+            const char* stringOvenMinTemp = minTempParam->value().c_str();
+
+            currentSystem->startOven(std::strtod(stringCookingTime, nullptr), std::strtod(stringOvenMinTemp, nullptr));
+
+            request->send(200);
+        } else {
+            request->send(500);
+        }
+        
     });
 
     //Route non existante

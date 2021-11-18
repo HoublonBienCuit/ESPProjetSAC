@@ -2,6 +2,7 @@
 
 #include <HTTPClient.h>
 #include <WiFiManager.h>
+#include <Arduino.h>
 
 #include "../headers/MyOled.h"
 #include "../headers/TemperatureStub.h"
@@ -17,6 +18,10 @@
 
 #define ACTION_PIN 33
 #define RESET_PIN 32
+
+#define LED_JAUNE 27
+#define LED_VERT 14
+#define LED_ROUGE 12
 
 //Variables déclarées seulement dans OvenSystem.cpp
 #ifdef OVENSYSTEM_CPP
@@ -39,6 +44,11 @@ class OvenSystem {
         void update(float dt);
 
         double getOvenTemp();
+
+        void startOven(double time, double minCelsius);
+        void stopOven();
+
+        int getOvenTime();
     private:
         void initAll();
 
@@ -47,12 +57,29 @@ class OvenSystem {
         void initWifi();
         void initServer();
 
+        void activeLeds(bool);
+
+        void ledsAnimation(float dt);
+        bool isWifiConnected();
+        bool isLedAnimationDone();
+
         MyOled* myOled;
         TemperatureStub* temperatureStub;
         MyServer* myServer;
         WiFiManager* wifiManager;
 
         double ovenTemp;
+
+        double dtLedAnimation = 0;
+        int amtAnimationTimes = 0;
+
+        bool serverInit = false;
+
+        double ovenTime = 0;
+        double ovenCookingTime = 0;
+        double ovenMinTemp = 0;
+
+        bool isOvenStarted = false;
 };
 
 template<typename ValueType>

@@ -30,6 +30,8 @@ void OvenSystem::initTempStub() {
 void OvenSystem::initWifi() {
     //init wifiManager
     wifiManager = new WiFiManager();
+    //wifiManager->setDebugOutput(false);
+    wifiManager->setConfigPortalBlocking(false);
 
     Screen* currentScreen = myOled->getScreen();
 
@@ -52,13 +54,21 @@ void OvenSystem::initServer() {
     string ipv4Adress = WiFi.localIP().toString().c_str();
     currentScreen->getElementById("ip_adress_P3")->changeText(ipv4Adress);
     currentScreen->getElementById("ip_adress_P4")->changeText(ipv4Adress);
+
+    serverInit = true;
 }
 
 void OvenSystem::initAll() {
+    pinMode(LED_JAUNE, OUTPUT);
+    pinMode(LED_VERT, OUTPUT);
+    pinMode(LED_ROUGE, OUTPUT);
+
     initOled();
     initTempStub();
     initWifi();
-    initServer();
+
+    if (isWifiConnected())
+        initServer();
 }
 
 void OvenSystem::update(float dt) {
@@ -71,8 +81,89 @@ void OvenSystem::update(float dt) {
         currentScreen->getElementById("temp_P3")->changeText(toString(ovenTemp));
         currentScreen->getElementById("temp_P4")->changeText(toString(ovenTemp));
     }
+
+    if (!isLedAnimationDone() && isWifiConnected()) {
+        if (!serverInit)
+            initServer();
+        ledsAnimation(dt);
+    } else if (!serverInit) {
+        wifiManager->process();
+    }
+
+    if (isOvenStarted) {
+        if (ovenTemp >= ovenMinTemp) {
+            ovenTime += dt;
+            if (ovenTemp >= ovenCookingTime) {
+                stopOven();
+            }
+        } else {
+            if (ovenTemp != 0) {
+                ovenTime -= dt;
+                ovenTime = ovenTime <= 0 ? 0 : ovenTime;
+
+                Screen* screen = myOled->getScreen();
+                screen->getElementById("state_P4")->changeText("Attente");
+            }
+        }
+    }
+}
+
+bool OvenSystem::isLedAnimationDone() {
+    return amtAnimationTimes == 2;
+}
+
+bool OvenSystem::isWifiConnected() {
+    return !wifiManager->getWiFiSSID().isEmpty();
+}
+
+void OvenSystem::ledsAnimation(float dt) {
+    dtLedAnimation += dt;
+    if (dtLedAnimation >= 1) {
+        if (dtLedAnimation >= 2) {
+            activeLeds(false);
+
+            dtLedAnimation = 0;
+            amtAnimationTimes++;
+
+            if (amtAnimationTimes == 2)
+                myOled->getScreen()->changePage(READY_PAGE);
+        } else {
+            activeLeds(true);
+        }
+    }
 }
 
 double OvenSystem::getOvenTemp() {
     return ovenTemp;
+}
+
+void OvenSystem::activeLeds(bool active) {
+    digitalWrite(LED_JAUNE, active ? HIGH : LOW);
+    digitalWrite(LED_VERT, active ? HIGH : LOW);
+    digitalWrite(LED_ROUGE, active ? HIGH : LOW);
+}
+
+void OvenSystem::startOven(double time, double minCelsius) {
+    isOvenStarted = true;
+    ovenMinTemp = minCelsius;
+    ovenCookingTime = time;
+
+    Screen* screen = myOled->getScreen();
+    screen->changePage(OVEN_PAGE);
+
+    std::string state = ovenTemp >= ovenMinTemp ? "Chauffage" : "Attente";
+    screen->getElementById("state_P4")->changeText(state);
+}
+
+void OvenSystem::stopOven() {
+    isOvenStarted = false;
+    ovenTime = 0;
+    ovenMinTemp = 0;
+    ovenCookingTime = 0;
+
+    myOled->getScreen()->changePage(READY_PAGE);
+}
+
+int OvenSystem::getOvenTime() {
+    return ovenTime;
 }
