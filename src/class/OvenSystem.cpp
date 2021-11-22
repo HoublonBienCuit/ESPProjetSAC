@@ -10,8 +10,12 @@ void OvenSystem::initOled() {
     //init MyOled
     myOled = new MyOled();
 
-    //Définir le texte des boutons
     Screen* currentScreen = myOled->getScreen();
+    temp_P3 = currentScreen->getElementById("temp_P3");
+    temp_P4 = currentScreen->getElementById("temp_P4");
+    state_P4 = currentScreen->getElementById("state_P4");
+
+    //Définir le texte des boutons
     currentScreen->getElementById("action_P1")->changeText(toString(ACTION_PIN));
     currentScreen->getElementById("reset_P1")->changeText(toString(RESET_PIN));
 
@@ -77,9 +81,8 @@ void OvenSystem::update(float dt) {
     double lastTemp = ovenTemp;
     ovenTemp = temperatureStub->getTemperature();
     if (lastTemp != ovenTemp) {
-        Screen* currentScreen = myOled->getScreen();
-        currentScreen->getElementById("temp_P3")->changeText(toString(ovenTemp));
-        currentScreen->getElementById("temp_P4")->changeText(toString(ovenTemp));
+        temp_P3->changeText(toString(ovenTemp));
+        temp_P4->changeText(toString(ovenTemp));
     }
 
     if (!isLedAnimationDone() && isWifiConnected()) {
@@ -87,22 +90,34 @@ void OvenSystem::update(float dt) {
             initServer();
         ledsAnimation(dt);
     } else if (!serverInit) {
+        Serial.println("[1]-Server not init, processing...");
         wifiManager->process();
+        Serial.println("[2]-Server not init, processing...");
     }
 
     if (isOvenStarted) {
         if (ovenTemp >= ovenMinTemp) {
             ovenTime += dt;
-            if (ovenTemp >= ovenCookingTime) {
+            if (ovenTime >= ovenCookingTime) {
                 stopOven();
             }
+
+            if (state_P4->getText() != "Chauffage") {
+                int activeLeds[] = {LED_ROUGE};
+                activeSpecificLeds(activeLeds);
+                state_P4->changeText("Chauffage");
+            }
+                    
         } else {
             if (ovenTemp != 0) {
                 ovenTime -= dt;
                 ovenTime = ovenTime <= 0 ? 0 : ovenTime;
 
-                Screen* screen = myOled->getScreen();
-                screen->getElementById("state_P4")->changeText("Attente");
+                if (state_P4->getText() != "Attente") {
+                    int activeLeds[] = {LED_ROUGE, LED_JAUNE};
+                    activeSpecificLeds(activeLeds);
+                    state_P4->changeText("Attente");
+                }
             }
         }
     }
@@ -125,8 +140,12 @@ void OvenSystem::ledsAnimation(float dt) {
             dtLedAnimation = 0;
             amtAnimationTimes++;
 
-            if (amtAnimationTimes == 2)
+            if (amtAnimationTimes == 2) {
                 myOled->getScreen()->changePage(READY_PAGE);
+                
+                int activeLeds[] = {LED_VERT};
+                activeSpecificLeds(activeLeds);
+            }
         } else {
             activeLeds(true);
         }
@@ -143,6 +162,14 @@ void OvenSystem::activeLeds(bool active) {
     digitalWrite(LED_ROUGE, active ? HIGH : LOW);
 }
 
+void OvenSystem::activeSpecificLeds(int led[]) {
+    activeLeds(false);
+
+    for (int i = 0; i < sizeof(led) / sizeof(led[0]); i++) {
+        digitalWrite(led[i], HIGH);
+    }
+}
+
 void OvenSystem::startOven(double time, double minCelsius) {
     isOvenStarted = true;
     ovenMinTemp = minCelsius;
@@ -152,7 +179,15 @@ void OvenSystem::startOven(double time, double minCelsius) {
     screen->changePage(OVEN_PAGE);
 
     std::string state = ovenTemp >= ovenMinTemp ? "Chauffage" : "Attente";
-    screen->getElementById("state_P4")->changeText(state);
+    state_P4->changeText(state);
+
+    if (state == "Chauffage") {
+        int activeLeds[] = {LED_ROUGE, LED_JAUNE};
+        activeSpecificLeds(activeLeds);
+    } else {
+        int activeLeds[] = {LED_ROUGE};
+        activeSpecificLeds(activeLeds);
+    }
 }
 
 void OvenSystem::stopOven() {
@@ -162,6 +197,13 @@ void OvenSystem::stopOven() {
     ovenCookingTime = 0;
 
     myOled->getScreen()->changePage(READY_PAGE);
+
+    int activeLeds[] = {LED_VERT};
+    activeSpecificLeds(activeLeds);
+}
+
+bool OvenSystem::isOvenStartedFunc() {
+    return isOvenStarted;
 }
 
 int OvenSystem::getOvenTime() {

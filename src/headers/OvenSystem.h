@@ -49,6 +49,8 @@ class OvenSystem {
         void stopOven();
 
         int getOvenTime();
+
+        bool isOvenStartedFunc();
     private:
         void initAll();
 
@@ -62,6 +64,8 @@ class OvenSystem {
         void ledsAnimation(float dt);
         bool isWifiConnected();
         bool isLedAnimationDone();
+
+        void activeSpecificLeds(int led[]);
 
         MyOled* myOled;
         TemperatureStub* temperatureStub;
@@ -80,6 +84,10 @@ class OvenSystem {
         double ovenMinTemp = 0;
 
         bool isOvenStarted = false;
+
+        Text* temp_P3;
+        Text* temp_P4;
+        Text* state_P4;
 };
 
 template<typename ValueType>

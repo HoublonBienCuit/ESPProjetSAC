@@ -8,6 +8,13 @@
 
 /** Liste du bois */
 var listeBoisInformations = {};
+var currentBoisId = null;
+
+var ovenIsStarted = false;
+var ovenEnabled = true;
+var intervalCookingTime = null;
+
+var demarrerFourElement = getElement("#demarrerFour");
 
 const routeAPI = "http://10.0.0.52/";
 
@@ -35,6 +42,8 @@ function getElement(query) {
 
 /**Fonction qui affiche les détails du bois */
 function afficherDetailsBois(idBois) {
+    currentBoisId = idBois;
+
     let bois = listeBoisInformations[idBois];
     getElement("#bois").innerHTML = bois.nom;
     getElement("#type").innerHTML = bois.type;
@@ -46,6 +55,32 @@ function afficherDetailsBois(idBois) {
     getElement("#tempMinFour").innerHTML = bois.tempMin;
     getElement("#tempsTotal").innerHTML = bois.tempsSechage;
 
+}
+
+function stopOven() {
+    ovenIsStarted = false;
+    ovenEnabled = true;
+
+    if (intervalCookingTime) {
+        clearInterval(intervalCookingTime);
+        demarrerFourElement.innerHTML = "Démarrage du four";
+        getElement("#tempVal").innerHTML = "-";
+        getElement("#tempsActuel").innerHTML = "0";
+    }
+}
+
+function setCurrentCookingTime() {
+    sendGETRequest("getOvenCookingInformations", {}, function() {
+        if (this.readyState != 4) return;
+        if (this.status == 200) {
+            let ovenCookingInf = JSON.parse(this.responseText);
+            if (!ovenCookingInf.isStarted)
+                return stopOven();
+
+            getElement("#tempsActuel").innerHTML = ovenCookingInf.time;
+            getElement("#tempVal").innerHTML = ovenCookingInf.temp;
+        }
+    });
 }
 
 /**Event du chargement de la page */
@@ -76,20 +111,33 @@ window.onload = function() {
     selectionBois.addEventListener("change", function() {
         afficherDetailsBois(this.value);
     });
+    
+    demarrerFourElement.onclick = function() {
+        if (!ovenEnabled) { return; }
 
-    //Update la température du four à chaque seconde
-    setInterval(function() {
-        sendGETRequest("getFourTemp", {}, function() {
-            if (this.readyState != 4) return;
-            if (this.status == 200) {
-                var tempFour = JSON.parse(this.responseText);
-                if (tempFour != null) {
-                    let tempElement = getElement("#tempVal");
-                    tempElement.innerHTML = tempFour;
-                } else {
-                    //console.log("err");
+        let bois = listeBoisInformations[currentBoisId];
+        ovenEnabled = false;
+
+        if (!ovenIsStarted) {
+            sendGETRequest("startOven", {
+                "cookingTime": bois.tempsSechage,
+                "minTemp": bois.tempMin
+            }, function() {
+                if (this.readyState != 4) return;
+                ovenIsStarted = this.status == 200;
+                ovenEnabled = true;
+
+                if (ovenIsStarted) {
+                    intervalCookingTime = setInterval(setCurrentCookingTime, 1000);
+                    demarrerFourElement.innerHTML = "Arrêt du four";
                 }
-            }
-        });
-    }, 2000);
+            });
+        } else {
+            sendGETRequest("stopOven", {}, function() {
+                if (this.readyState != 4) return;
+                stopOven();
+            });
+        }
+        
+    };
 }

@@ -38,14 +38,14 @@ void MyServer::initAllRoutes() {
         request->send(200, "application/json", response);
     });
 
-    this->on("/getFourTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
+    /*this->on("/getFourTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
         std::string temperatureString = toString(currentSystem->getOvenTemp());
 
         request->send(200, "application/json", String(temperatureString.c_str()));
-    });
+    });*/
 
     this->on("/startOven", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (request->hasParam("") && request->hasParam("")) {
+        if (request->hasParam("cookingTime") && request->hasParam("minTemp")) {
             AsyncWebParameter* cookingTimeParam = request->getParam("cookingTime");
             AsyncWebParameter* minTempParam = request->getParam("minTemp");
             const char* stringCookingTime = cookingTimeParam->value().c_str();
@@ -57,7 +57,20 @@ void MyServer::initAllRoutes() {
         } else {
             request->send(500);
         }
-        
+    });
+
+    this->on("/stopOven", HTTP_GET, [](AsyncWebServerRequest *request) {
+        currentSystem->stopOven();
+
+        request->send(200);
+    });
+
+    this->on("/getOvenCookingInformations", HTTP_GET, [](AsyncWebServerRequest *request) {
+        String ovenCookingTime = toString(currentSystem->getOvenTime()).c_str();
+        String temperatureString = toString(currentSystem->getOvenTemp()).c_str();
+        String isOvenStartedString = currentSystem->isOvenStartedFunc() ? "true" : "false";
+
+        request->send(200, "application/json", String("{\"isStarted\": " + isOvenStartedString + ", \"time\":" + ovenCookingTime + ", \"temp\": " + temperatureString + " }"));
     });
 
     //Route non existante

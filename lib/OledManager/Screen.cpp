@@ -60,7 +60,7 @@ void Screen::update() {
                 _display.setCursor(position.getX(), position.getY());
 
                 // Permet l'écriture de spécials caractères comme é, É, è //
-
+                //_display.print(texte->getText().c_str());
                 string stringText = texte->getText();
                 const char* charText = stringText.c_str();
 
