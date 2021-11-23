@@ -20,12 +20,19 @@ void MyServer::initAllRoutes() {
 
     //Route initiale (page html de connexion)
     this->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/views/connexion.html", "text/html");
+        if (!currentSystem->isAuth(""))
+            request->send(SPIFFS, "/views/connexion.html", "text/html");
+        else
+            request->redirect("/application");
+        
     });
 
     //Route de l'application (page html)
     this->on("/application", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/views/application.html", "text/html");
+        if (currentSystem->isAuth(""))
+            request->send(SPIFFS, "/views/application.html", "text/html");
+        else
+            request->redirect("/");
     });
 
     this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -37,12 +44,6 @@ void MyServer::initAllRoutes() {
         
         request->send(200, "application/json", response);
     });
-
-    /*this->on("/getFourTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
-        std::string temperatureString = toString(currentSystem->getOvenTemp());
-
-        request->send(200, "application/json", String(temperatureString.c_str()));
-    });*/
 
     this->on("/startOven", HTTP_GET, [](AsyncWebServerRequest *request) {
         if (request->hasParam("cookingTime") && request->hasParam("minTemp")) {

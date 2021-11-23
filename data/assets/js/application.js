@@ -16,7 +16,7 @@ var intervalCookingTime = null;
 
 var demarrerFourElement = getElement("#demarrerFour");
 
-const routeAPI = "http://10.0.0.52/";
+const routeAPI = "http://10.0.0.53/";
 
 /**Fonction qui permet d'envoyer une requête par la méthode GET */
 function sendGETRequest(apiRequest, params, callback) {

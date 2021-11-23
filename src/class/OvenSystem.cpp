@@ -103,8 +103,8 @@ void OvenSystem::update(float dt) {
             }
 
             if (state_P4->getText() != "Chauffage") {
-                int activeLeds[] = {LED_ROUGE};
-                activeSpecificLeds(activeLeds);
+                int activeLeds[] = {LED_ROUGE, LED_JAUNE};
+                activeSpecificLeds(activeLeds, 2);
                 state_P4->changeText("Chauffage");
             }
                     
@@ -114,8 +114,8 @@ void OvenSystem::update(float dt) {
                 ovenTime = ovenTime <= 0 ? 0 : ovenTime;
 
                 if (state_P4->getText() != "Attente") {
-                    int activeLeds[] = {LED_ROUGE, LED_JAUNE};
-                    activeSpecificLeds(activeLeds);
+                    int activeLeds[] = {LED_ROUGE};
+                    activeSpecificLeds(activeLeds, 1);
                     state_P4->changeText("Attente");
                 }
             }
@@ -144,7 +144,7 @@ void OvenSystem::ledsAnimation(float dt) {
                 myOled->getScreen()->changePage(READY_PAGE);
                 
                 int activeLeds[] = {LED_VERT};
-                activeSpecificLeds(activeLeds);
+                activeSpecificLeds(activeLeds, 1);
             }
         } else {
             activeLeds(true);
@@ -162,11 +162,12 @@ void OvenSystem::activeLeds(bool active) {
     digitalWrite(LED_ROUGE, active ? HIGH : LOW);
 }
 
-void OvenSystem::activeSpecificLeds(int led[]) {
+void OvenSystem::activeSpecificLeds(int* led, int length) {
     activeLeds(false);
 
-    for (int i = 0; i < sizeof(led) / sizeof(led[0]); i++) {
+    for (int i = 0; i < length; i++) {
         digitalWrite(led[i], HIGH);
+        Serial.print("led allumé: "); Serial.println(led[i]);
     }
 }
 
@@ -183,10 +184,10 @@ void OvenSystem::startOven(double time, double minCelsius) {
 
     if (state == "Chauffage") {
         int activeLeds[] = {LED_ROUGE, LED_JAUNE};
-        activeSpecificLeds(activeLeds);
+        activeSpecificLeds(activeLeds, 2);
     } else {
         int activeLeds[] = {LED_ROUGE};
-        activeSpecificLeds(activeLeds);
+        activeSpecificLeds(activeLeds, 1);
     }
 }
 
@@ -199,7 +200,7 @@ void OvenSystem::stopOven() {
     myOled->getScreen()->changePage(READY_PAGE);
 
     int activeLeds[] = {LED_VERT};
-    activeSpecificLeds(activeLeds);
+    activeSpecificLeds(activeLeds, 1);
 }
 
 bool OvenSystem::isOvenStartedFunc() {

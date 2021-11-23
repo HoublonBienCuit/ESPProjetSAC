@@ -3,6 +3,7 @@
 #include <HTTPClient.h>
 #include <WiFiManager.h>
 #include <Arduino.h>
+#include <vector>
 
 #include "../headers/MyOled.h"
 #include "../headers/TemperatureStub.h"
@@ -65,7 +66,7 @@ class OvenSystem {
         bool isWifiConnected();
         bool isLedAnimationDone();
 
-        void activeSpecificLeds(int led[]);
+        void activeSpecificLeds(int* led, int length);
 
         MyOled* myOled;
         TemperatureStub* temperatureStub;
