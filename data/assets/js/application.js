@@ -32,6 +32,7 @@ function sendGETRequest(apiRequest, params, callback) {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('Access-Control-Allow-Headers', '*');
     xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+    xhr.setRequestHeader('Authorization', "Bearer " + localStorage.getItem("token"));
     xhr.send();
 }
 

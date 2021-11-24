@@ -20,58 +20,68 @@ void MyServer::initAllRoutes() {
 
     //Route initiale (page html de connexion)
     this->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (!currentSystem->isAuth(""))
-            request->send(SPIFFS, "/views/connexion.html", "text/html");
-        else
-            request->redirect("/application");
-        
+        request->send(SPIFFS, "/views/connexion.html", "text/html");
     });
 
     //Route de l'application (page html)
     this->on("/application", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (currentSystem->isAuth(""))
-            request->send(SPIFFS, "/views/application.html", "text/html");
-        else
-            request->redirect("/");
+        request->send(SPIFFS, "/views/application.html", "text/html");
     });
 
     this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
-        HTTPClient http;
-        String woodApiRestAddress = "http://10.0.0.78:8000/api/ObtenirTousBois";
-        http.begin(woodApiRestAddress);
-        http.GET();
-        String response = http.getString();
+        if (currentSystem->isAuth(request)) {
+            Serial.print("GetAllWood");
+            HTTPClient http;
+            String woodApiRestAddress = "http://10.0.0.78:8000/api/ObtenirTousBois";
+            http.begin(woodApiRestAddress);
+            http.GET();
+            String response = http.getString();
+            
+            request->send(200, "application/json", response);
+        } else {
+            request->send(401);
+        }
         
-        request->send(200, "application/json", response);
     });
 
     this->on("/startOven", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (request->hasParam("cookingTime") && request->hasParam("minTemp")) {
-            AsyncWebParameter* cookingTimeParam = request->getParam("cookingTime");
-            AsyncWebParameter* minTempParam = request->getParam("minTemp");
-            const char* stringCookingTime = cookingTimeParam->value().c_str();
-            const char* stringOvenMinTemp = minTempParam->value().c_str();
+        if (currentSystem->isAuth(request)) {
+            if (request->hasParam("cookingTime") && request->hasParam("minTemp")) {
+                AsyncWebParameter* cookingTimeParam = request->getParam("cookingTime");
+                AsyncWebParameter* minTempParam = request->getParam("minTemp");
+                const char* stringCookingTime = cookingTimeParam->value().c_str();
+                const char* stringOvenMinTemp = minTempParam->value().c_str();
 
-            currentSystem->startOven(std::strtod(stringCookingTime, nullptr), std::strtod(stringOvenMinTemp, nullptr));
+                currentSystem->startOven(std::strtod(stringCookingTime, nullptr), std::strtod(stringOvenMinTemp, nullptr));
 
-            request->send(200);
+                request->send(200);
+            } else {
+                request->send(500);
+            }
         } else {
-            request->send(500);
+            request->send(401);
         }
     });
 
     this->on("/stopOven", HTTP_GET, [](AsyncWebServerRequest *request) {
-        currentSystem->stopOven();
-
-        request->send(200);
+        if (currentSystem->isAuth(request)) {
+            currentSystem->stopOven();
+            request->send(200);
+        } else {
+            request->send(401);
+        }
     });
 
     this->on("/getOvenCookingInformations", HTTP_GET, [](AsyncWebServerRequest *request) {
-        String ovenCookingTime = toString(currentSystem->getOvenTime()).c_str();
-        String temperatureString = toString(currentSystem->getOvenTemp()).c_str();
-        String isOvenStartedString = currentSystem->isOvenStartedFunc() ? "true" : "false";
+        if (currentSystem->isAuth(request)) {
+            String ovenCookingTime = toString(currentSystem->getOvenTime()).c_str();
+            String temperatureString = toString(currentSystem->getOvenTemp()).c_str();
+            String isOvenStartedString = currentSystem->isOvenStartedFunc() ? "true" : "false";
 
-        request->send(200, "application/json", String("{\"isStarted\": " + isOvenStartedString + ", \"time\":" + ovenCookingTime + ", \"temp\": " + temperatureString + " }"));
+            request->send(200, "application/json", String("{\"isStarted\": " + isOvenStartedString + ", \"time\":" + ovenCookingTime + ", \"temp\": " + temperatureString + " }"));
+        } else {
+            request->send(401);
+        }
     });
 
     //Route non existante

@@ -14,6 +14,7 @@ void OvenSystem::initOled() {
     temp_P3 = currentScreen->getElementById("temp_P3");
     temp_P4 = currentScreen->getElementById("temp_P4");
     state_P4 = currentScreen->getElementById("state_P4");
+    animation_P4 = currentScreen->getElementById("animation_P4");
 
     //Définir le texte des boutons
     currentScreen->getElementById("action_P1")->changeText(toString(ACTION_PIN));
@@ -102,6 +103,12 @@ void OvenSystem::update(float dt) {
                 stopOven();
             }
 
+            if (animation_P4->getText() == "IiiIiiI")
+                animation_P4->changeText("iIIiIIi");
+            else
+                animation_P4->changeText("IiiIiiI");
+            
+
             if (state_P4->getText() != "Chauffage") {
                 int activeLeds[] = {LED_ROUGE, LED_JAUNE};
                 activeSpecificLeds(activeLeds, 2);
@@ -117,6 +124,7 @@ void OvenSystem::update(float dt) {
                     int activeLeds[] = {LED_ROUGE};
                     activeSpecificLeds(activeLeds, 1);
                     state_P4->changeText("Attente");
+                    animation_P4->changeText("-------");
                 }
             }
         }
@@ -128,7 +136,7 @@ bool OvenSystem::isLedAnimationDone() {
 }
 
 bool OvenSystem::isWifiConnected() {
-    return !wifiManager->getWiFiSSID().isEmpty();
+    return WiFi.localIP().toString() != "0.0.0.0";
 }
 
 void OvenSystem::ledsAnimation(float dt) {
@@ -167,7 +175,6 @@ void OvenSystem::activeSpecificLeds(int* led, int length) {
 
     for (int i = 0; i < length; i++) {
         digitalWrite(led[i], HIGH);
-        Serial.print("led allumé: "); Serial.println(led[i]);
     }
 }
 
@@ -188,6 +195,7 @@ void OvenSystem::startOven(double time, double minCelsius) {
     } else {
         int activeLeds[] = {LED_ROUGE};
         activeSpecificLeds(activeLeds, 1);
+        animation_P4->changeText("-------");
     }
 }
 
@@ -201,6 +209,7 @@ void OvenSystem::stopOven() {
 
     int activeLeds[] = {LED_VERT};
     activeSpecificLeds(activeLeds, 1);
+    animation_P4->changeText("-------");
 }
 
 bool OvenSystem::isOvenStartedFunc() {
@@ -209,4 +218,16 @@ bool OvenSystem::isOvenStartedFunc() {
 
 int OvenSystem::getOvenTime() {
     return ovenTime;
+}
+
+bool OvenSystem::isAuth(AsyncWebServerRequest* request) {
+    if (request->hasHeader("Authorization")) {
+        HTTPClient http;
+        String loginRoute = "http://10.0.0.78:8000/api/isAuth";
+        http.begin(loginRoute);
+        AsyncWebHeader* header = request->getHeader("Authorization");
+        String headerString = header->value().c_str();
+        http.addHeader("Authorization", headerString);
+        return http.GET() == 200;
+    } else return false;
 }

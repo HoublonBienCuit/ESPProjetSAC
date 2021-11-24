@@ -44,7 +44,7 @@ void MyOled::init() {
     pageOven[0] = new Text(Vector2(32, 0), 1, "SAC Système", "titre_P4");
     pageOven[1] = new Text(Vector2(0, 15), 1, "Id: 92834", "id_P4");
     pageOven[2] = new Text(Vector2(70, 15), 1, "", "state_P4");
-    pageOven[3] = new Text(Vector2(70, 27), 1, "-o-o-o-", "animation_P4");
+    pageOven[3] = new Text(Vector2(70, 27), 1, "-------", "animation_P4");
     pageOven[4] = new Text(Vector2(20, 27), 1, "", "temp_P4");
     pageOven[5] = new Text(Vector2(50, 51), 1, "", "ip_adress_P4");
     _screen->addPage(6, pageOven);

@@ -52,6 +52,7 @@ class OvenSystem {
         int getOvenTime();
 
         bool isOvenStartedFunc();
+        bool isAuth(AsyncWebServerRequest* request);
     private:
         void initAll();
 
@@ -89,6 +90,7 @@ class OvenSystem {
         Text* temp_P3;
         Text* temp_P4;
         Text* state_P4;
+        Text* animation_P4;
 };
 
 template<typename ValueType>
