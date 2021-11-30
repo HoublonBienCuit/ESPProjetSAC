@@ -105,7 +105,7 @@ void OvenSystem::initAll() {
 
 //Fonction loop
 void OvenSystem::update(float dt) {
-    myOled->update();
+    myOled->update(dt);
 
     //Gère la température à afficher sur le OLED
     double lastTemp = ovenTemp;

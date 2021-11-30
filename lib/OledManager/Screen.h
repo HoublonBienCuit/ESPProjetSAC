@@ -106,7 +106,7 @@ class Screen {
         ~Screen() {};
 
         int init(uint8_t addrI2C = DEFAULT_OLED_I2C_ADDRESS);
-        void update();
+        void update(float dt);
 
         void clearScreen();
 
@@ -141,4 +141,6 @@ class Screen {
 
         //Vrai si l'écran est en veille
         bool _standBy = false;
+        float _standByTime = 30.0f;
+        float _idleTime = 0.0f;
 };

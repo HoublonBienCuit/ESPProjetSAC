@@ -45,7 +45,7 @@ class MyOled {
         MyOled();
         ~MyOled() {};
 
-        void update();
+        void update(float dt);
         Screen* getScreen();
 
     private:

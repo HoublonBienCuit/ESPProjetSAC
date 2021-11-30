@@ -62,8 +62,8 @@ void MyOled::init() {
 }
 
 //Loop
-void MyOled::update() {
-    _screen->update();
+void MyOled::update(float dt) {
+    _screen->update(dt);
 }
 
 //Permet de récupérer l'objet screen

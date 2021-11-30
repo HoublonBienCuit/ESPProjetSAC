@@ -45,8 +45,13 @@ int Screen::init(uint8_t addrI2C) {
  * 
  * @param dt le temps en seconde entre deux frames
  */
-void Screen::update() {
+void Screen::update(float dt) {
     if (_standBy == false) {
+        _idleTime += dt;
+        if (_idleTime >= _standByTime) {
+            setStandBy(true);
+        }
+
         _display.clearDisplay();
         //Seulement pour du texte
         for (int index = 0; index < _instancesPerPage[_currentPage]; index++)
@@ -60,7 +65,6 @@ void Screen::update() {
                 _display.setCursor(position.getX(), position.getY());
 
                 // Permet l'écriture de spécials caractères comme é, É, è //
-                //_display.print(texte->getText().c_str());
                 string stringText = texte->getText();
                 const char* charText = stringText.c_str();
 
@@ -83,6 +87,8 @@ void Screen::update() {
             }
         }
         _display.display();
+    } else {
+        clearScreen();
     }
 }
 
@@ -105,6 +111,7 @@ void Screen::setStandBy(bool standBy) {
 
     if (_standBy == true) {
         clearScreen();
+        _idleTime = 0.0f;
     }
 }
 
@@ -141,6 +148,7 @@ void Screen::addPage(int te, Text* elements[]) {
 void Screen::changePage(int page) {
     if (_currentPage != page) {
         _currentPage = page;
+        _idleTime = 0.0f;
     }
 }
 
