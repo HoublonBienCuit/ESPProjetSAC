@@ -141,7 +141,6 @@ void Screen::addPage(int te, Text* elements[]) {
 void Screen::changePage(int page) {
     if (_currentPage != page) {
         _currentPage = page;
-        Serial.print(page);
     }
 }
 

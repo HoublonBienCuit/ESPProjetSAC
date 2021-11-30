@@ -28,6 +28,7 @@ void MyServer::initAllRoutes() {
         request->send(SPIFFS, "/views/application.html", "text/html");
     });
 
+    //Route pour récupérer tous le bois de l'API
     this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
         if (currentSystem->isAuth(request)) {
             Serial.print("GetAllWood");
@@ -44,6 +45,7 @@ void MyServer::initAllRoutes() {
         
     });
 
+    //Route pour démarrer le four
     this->on("/startOven", HTTP_GET, [](AsyncWebServerRequest *request) {
         if (currentSystem->isAuth(request)) {
             if (request->hasParam("cookingTime") && request->hasParam("minTemp")) {
@@ -63,6 +65,7 @@ void MyServer::initAllRoutes() {
         }
     });
 
+    //Router pour arrêter le four
     this->on("/stopOven", HTTP_GET, [](AsyncWebServerRequest *request) {
         if (currentSystem->isAuth(request)) {
             currentSystem->stopOven();
@@ -72,6 +75,7 @@ void MyServer::initAllRoutes() {
         }
     });
 
+    //Route pour obtenir les informations du four
     this->on("/getOvenCookingInformations", HTTP_GET, [](AsyncWebServerRequest *request) {
         if (currentSystem->isAuth(request)) {
             String ovenCookingTime = toString(currentSystem->getOvenTime()).c_str();

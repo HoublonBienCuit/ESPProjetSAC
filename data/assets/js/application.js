@@ -18,6 +18,11 @@ var demarrerFourElement = getElement("#demarrerFour");
 
 const routeAPI = "http://10.0.0.53/";
 
+//Leds element
+var redLed = getElement(".delRouge");
+var yellowLed = getElement(".delJaune");
+var greenLed = getElement(".delVerte");
+
 /**Fonction qui permet d'envoyer une requête par la méthode GET */
 function sendGETRequest(apiRequest, params, callback) {
     let paramsString = "?";
@@ -67,8 +72,14 @@ function stopOven() {
         demarrerFourElement.innerHTML = "Démarrage du four";
         getElement("#tempVal").innerHTML = "-";
         getElement("#tempsActuel").innerHTML = "0";
+		
+		activeSpecificLeds([
+			greenLed			
+		]);
     }
 }
+
+var oldTime = 0;
 
 function setCurrentCookingTime() {
     sendGETRequest("getOvenCookingInformations", {}, function() {
@@ -80,8 +91,34 @@ function setCurrentCookingTime() {
 
             getElement("#tempsActuel").innerHTML = ovenCookingInf.time;
             getElement("#tempVal").innerHTML = ovenCookingInf.temp;
+			
+			let timeDiff = (ovenCookingInf.time - oldTime);
+			if (timeDiff > 0) {
+				activeSpecificLeds([
+					redLed,
+					yellowLed
+				]);
+			} else {
+				activeSpecificLeds([
+					redLed
+				]);
+			}
+			
+			oldTime = ovenCookingInf.time;
         }
     });
+}
+
+function activeSpecificLeds(ledsArray) {
+	redLed.classList.remove("active");
+	yellowLed.classList.remove("active");
+	greenLed.classList.remove("active");
+	
+	ledsArray.forEach(ledElement =>  {
+		ledElement.classList.add("active");
+	});
+	
+	
 }
 
 /**Event du chargement de la page */
@@ -131,6 +168,8 @@ window.onload = function() {
                 if (ovenIsStarted) {
                     intervalCookingTime = setInterval(setCurrentCookingTime, 1000);
                     demarrerFourElement.innerHTML = "Arrêt du four";
+					
+					
                 }
             });
         } else {

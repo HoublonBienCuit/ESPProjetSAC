@@ -89,7 +89,7 @@ int const MAX_INSTANCES_PER_PAGE = 7;
 //Variables d'initialization de l'écran
 #define DEFAULT_SCREEN_WIDTH 128        // OLED display width, in pixels
 #define DEFAULT_SCREEN_HEIGHT 64        // OLED display height, in pixels
-#define DEFAULT_OLED_RESET 4            // Reset pin # (or -1 if sharing Arduino reset pin)
+#define DEFAULT_OLED_RESET 32            // Reset pin # (or -1 if sharing Arduino reset pin)
 #define DEFAULT_OLED_I2C_ADDRESS 0x3C   // Adresse I2C de l'écran Oled
 
 /**

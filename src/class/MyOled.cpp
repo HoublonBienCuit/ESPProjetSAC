@@ -1,3 +1,10 @@
+/**
+    Gestion de l'écran par la lib Screen
+    @file MyOled.cpp
+    @author Daniel Boisclair
+    @version 1.0 21/11/29
+*/
+
 #include "../headers/MyOled.h"
 
 MyOled::MyOled() {
@@ -7,6 +14,7 @@ MyOled::MyOled() {
     init();
 }
 
+//Fonction d'initialization du OLED
 void MyOled::init() {
     //Page d'initialization
     Text* pageInit[MAX_INSTANCES_PER_PAGE];
@@ -49,13 +57,16 @@ void MyOled::init() {
     pageOven[5] = new Text(Vector2(50, 51), 1, "", "ip_adress_P4");
     _screen->addPage(6, pageOven);
 
+    //Change la page pour la page d'initialization
     _screen->changePage(INIT_PAGE);
 }
 
+//Loop
 void MyOled::update() {
     _screen->update();
 }
 
+//Permet de récupérer l'objet screen
 Screen* MyOled::getScreen() {
     return _screen;
 }
