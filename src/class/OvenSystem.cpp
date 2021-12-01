@@ -165,6 +165,7 @@ void OvenSystem::update(float dt) {
 
     //bouton reset
     if (resetBtn->checkMyButton() > 2) {
+        Serial.println("RESETTT");
         ESP.restart();
     }
 
